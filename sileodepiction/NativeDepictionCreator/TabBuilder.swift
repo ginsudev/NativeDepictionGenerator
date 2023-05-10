@@ -66,6 +66,10 @@ private extension NativeDepictionCreator.TabBuilder {
                         id: control.packageName,
                         screenshots: screenshots
                     )
+                ),
+                .init(
+                    depictionClass: .depictionMarkdownView,
+                    markdown: display.information.description
                 )
             ]
             +
@@ -106,9 +110,11 @@ private extension NativeDepictionCreator.TabBuilder {
         .init(
             depictionClass: .depictionStackView,
             tabname: "Changes",
-            views: display.changelog.flatMap {
-                changelogRow(changeEntry: $0)
-            }
+            views: display.changelog
+                .reversed()
+                .flatMap {
+                    changelogRow(changeEntry: $0)
+                }
         )
     }
     
@@ -127,7 +133,7 @@ private extension NativeDepictionCreator.TabBuilder {
                 ),
                 .init(
                     depictionClass: .depictionTableButtonView,
-                    action: display.contact.twitter,
+                    action: "https://twitter.com/\(display.contact.twitter)",
                     title: "Twitter"
                 )
             ]
