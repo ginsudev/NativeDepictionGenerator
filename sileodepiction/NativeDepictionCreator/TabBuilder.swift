@@ -57,16 +57,12 @@ private extension NativeDepictionCreator.TabBuilder {
                     text: Constants.donateText,
                     action: Constants.donateLink,
                     yPadding: 10
-                ),
-                .init(
-                    depictionClass: .depictionScreenshotsView,
-                    itemCornerRadius: 6,
-                    itemSize: "{160, 346}",
-                    screenshots: depictionScreenshots(
-                        id: control.packageName,
-                        screenshots: screenshots
-                    )
-                ),
+                )
+            ]
+            +
+            screenshotsSection(id: control.packageName, screenshots: screenshots)
+            +
+            [
                 .init(
                     depictionClass: .depictionMarkdownView,
                     markdown: display.information.description
@@ -192,15 +188,26 @@ private extension NativeDepictionCreator.TabBuilder {
         }
     }
     
-    static func depictionScreenshots(id: String, screenshots: Screenshots) -> [DepictionScreenshot] {
-        screenshots.screenshots
-            .map {
-                let url = "\(Constants.api)/\(id)/screenshots/\($0)"
-                return .init(
-                    url: url,
-                    fullSizeURL: url,
-                    accessibilityText: "Screenshot"
-                )
-            }
+    static func screenshotsSection(id: String, screenshots: Screenshots) -> [DepictionView] {
+        guard let firstScreenshot = screenshots.screenshots.first,
+              firstScreenshot.components(separatedBy: "/").last != "*"
+        else { return [] }
+        
+        return [
+            .init(
+                depictionClass: .depictionScreenshotsView,
+                itemCornerRadius: 6,
+                itemSize: "{160, 346}",
+                screenshots: screenshots.screenshots
+                    .map {
+                        let url = "\(Constants.api)/\(id)/screenshots/\($0)"
+                        return DepictionScreenshot(
+                            url: url,
+                            fullSizeURL: url,
+                            accessibilityText: "Screenshot"
+                        )
+                    }
+            )
+        ]
     }
 }
